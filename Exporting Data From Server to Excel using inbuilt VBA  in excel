@@ -1,0 +1,54 @@
+# Create a  Customers Dummmy table in your database and populate it
+
+# On Excell Go to 'File > options> CustomRibbon > Developer'  so you have to click developer tools and click okay
+# you go to devloper tools and click Visual Basics
+
+Sub Customers()
+    Dim conn As Object
+    Dim rs As Object
+    Dim sql As String
+    Dim server As String
+    Dim database As String
+    Dim username As String
+    Dim password As String
+    Dim ws As Worksheet
+    Dim i As Integer
+    
+    ' logins
+    server = "your_server_name"
+    database = "databasename"
+    username = "user"
+    password = "password"
+    
+    
+    Set conn = CreateObject("ADODB.Connection")
+    conn.ConnectionString = "Driver={SQL Server};Server=" & server & ";Database=" & database & ";Uid=" & username & ";Pwd=" & password & ";"
+    conn.Open
+    
+    ' SQL query to retrieve data ;)
+    sql = "SELECT * FROM dbo.Customers"  ' Your Customers table name
+    
+    
+    Set rs = CreateObject("ADODB.Recordset")
+    rs.Open sql, conn
+    
+    ' Create new worksheet on excel
+    Set ws = ThisWorkbook.Sheets.Add
+    ws.Name = "CustomersData"  'Name of the sheetdata is exported to
+    
+    ' Write column headers (we retrive the table with its column names ;) )
+    For i = 1 To rs.Fields.Count
+        ws.Cells(1, i).Value = rs.Fields(i - 1).Name
+    Next i
+    
+    ' Write data to worksheet
+    ws.Cells(2, 1).CopyFromRecordset rs
+    
+    ' Close the recordset and connection
+    rs.Close
+    conn.Close
+    Set rs = Nothing
+    Set conn = Nothing
+    ' alert when done ( This will pop up when its done) 
+    MsgBox "Data exported successfully to new sheet 'ExportedTableData'!", vbInformation
+End Sub
