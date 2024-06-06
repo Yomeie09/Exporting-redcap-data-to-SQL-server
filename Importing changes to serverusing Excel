@@ -1,0 +1,53 @@
+Sub ImportUpdatedFromExcelToSQL()
+    Dim conn As Object
+    Dim rs As Object
+    Dim sql As String
+    Dim server As String
+    Dim database As String
+    Dim username As String
+    Dim password As String
+    Dim ws As Worksheet
+    Dim i As Integer
+    Dim lastRow As Long
+    
+    ' Set SQL Server connection details
+    server = "yourservername"
+    database = "databasename"
+    username = "username"
+    password = "password"
+    
+    ' Create connection
+    Set conn = CreateObject("ADODB.Connection")
+    conn.ConnectionString = "Driver={SQL Server};Server=" & server & ";Database=" & database & ";Uid=" & username & ";Pwd=" & password & ";"
+    conn.Open
+    
+    ' Specify the worksheet containing the modified data
+    Set ws = ThisWorkbook.Sheets("CustomersData") ' the data you imported eariler and edited then you use it here
+    
+    ' Determine the last row with data in the worksheet
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    
+    ' Loop through each row in the worksheet and update data in the SQL Server table
+    For i = 2 To lastRow ' Assuming data starts from the second row
+    ' Construct the SQL UPDATE query dynamically for all columns
+    sql = "UPDATE customers SET "
+    For j = 2 To ws.UsedRange.Columns.Count ' Assuming Id column is in column 1, starting from column 2
+        ' Concatenate column names and values into the SQL query
+        sql = sql & ws.Cells(1, j).Value & "='" & ws.Cells(i, j).Value & "',"
+    Next j
+    ' Remove the trailing comma from the SQL query
+    sql = Left(sql, Len(sql) - 1)
+    ' Add WHERE clause to specify which row to update
+    sql = sql & " WHERE Id=" & ws.Cells(i, 1).Value ' Assuming Id column is in column 1
+    
+    ' Execute the SQL query
+    conn.Execute sql
+Next i
+
+    
+    ' Close the connection
+    conn.Close
+    Set conn = Nothing
+    
+    MsgBox "Data imported successfully from Excel to SQL Server!", vbInformation
+End Sub
