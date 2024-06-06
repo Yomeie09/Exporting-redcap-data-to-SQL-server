@@ -28,7 +28,7 @@ Sub ImportUpdatedFromExcelToSQL()
     lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
     
     ' Loop through each row in the worksheet and update data in the SQL Server table
-    For i = 2 To lastRow ' Assuming data starts from the second row
+    For i = 2 To lastRow ' My data starts from second row
     ' Construct the SQL UPDATE query dynamically for all columns
     sql = "UPDATE customers SET "
     For j = 2 To ws.UsedRange.Columns.Count ' Assuming Id column is in column 1, starting from column 2
