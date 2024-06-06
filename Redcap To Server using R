@@ -1,0 +1,31 @@
+# Importing data to SQL server 
+
+# Install libraries
+install.packages("odbc")
+install.packages("REDCapR")
+
+# Load libraries
+library(odbc)  # This library allows you to communicate with the server
+library(REDCapR)  # This library allows you to communicate with REDCap
+
+# You then  connect to your database 
+con <- dbConnect(odbc::odbc(), .connection_string = "Driver={SQL Server};",
+                 Server = "your_server_name",
+                 Database = "database_name",UID = "username", PWD = "password", timeout = 10)
+
+# You connect to your redcap address and use your API token
+url <- "https://redcap"
+token <- "123456789101112131415GHYMSGTS"
+#load your propject
+project <- redcap_read(redcap_uri=url, token=token)$data
+# make your project a data frame
+project<- as.data.frame(project)
+
+# you can do any creative things you want to do to your table 
+# This includes adding refresh time or getting  the position of your last variable 
+#dbWriteTable function in R, which is typically part of the DBI package It helps to also install that
+
+dbWriteTable(conn = con, name = 'your_table_name', value = project[,c( 1:d2)], overwrite = TRUE, append = FALSE)
+# you close you connection. 
+dbDisconnect(con) 
+#end!
